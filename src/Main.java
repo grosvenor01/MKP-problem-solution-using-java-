@@ -34,5 +34,11 @@ public class Main {
         }else {
              System.out.println("No Solution Found");
         }
+
+        //implementation d'algorithme A* 
+        //1- tronsformer la matrice 
+        System.out.println("\n");
+        cas_0.matrix_tronsformation();
+        //2- ajouter le cout d'heuristic a chaque noued 
     }
 }

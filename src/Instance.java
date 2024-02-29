@@ -15,6 +15,7 @@ public class Instance {
 	int total_nodes;
 	ArrayList<node> nodes_arr;
 	int[][] matrix_pb;
+	int knapsack_sum=0;
 	/* PARTIE I */
 
 	public Instance() {
@@ -47,6 +48,7 @@ public class Instance {
 			int max = random.nextInt(max_weightk - 10 + 1) + min_weightk;
 			new_knap = new knapsack(max, i + 1);
 			knapsack_arr.add(new_knap);
+			knapsack_sum +=max;
 		}
 
 		/*
@@ -80,7 +82,6 @@ public class Instance {
 			System.out.print(" knapsack have the max weight of ");
 			System.out.println(knapsack_arr.get(i).max_weight);
 		}
-
 		/* Affichage t3 les knapsck by accessing to thier properties using getters */
 		System.out.println("=====objects=====");
 		for (int i = 0; i < objects_num; i++) {
@@ -111,7 +112,7 @@ public class Instance {
 		int counter = knapsack_num + 1, counter2 = 0; // counter = 3 , counter2=0
 		while (true) {
 			for (int i = 0; i < knapsack_num + 1; i++) {
-				my_node = new node(nodes_arr.get(c).objects, objects_num, d);
+				my_node = new node(nodes_arr.get(c).objects, objects_num, d,knapsack_sum,obj_arr);
 				if (i == knapsack_num) {
 					my_node.set_objects(position, -1);
 				} else {
@@ -166,6 +167,7 @@ public class Instance {
 		System.out.println();
 		for (int i = 0; i < total_nodes; i++) {
 			nodes_arr.get(i).afficher();
+			System.out.print("heuristic value --> "+nodes_arr.get(i).heuristic);
 			System.out.println();
 		}
 		// Affichage matrice
@@ -328,6 +330,31 @@ public class Instance {
             }
         }
     }
+	public void matrix_tronsformation(){ // transoforming the matrix to value based cost 
+		int counter=0;
+		for(int i=0;i<total_nodes;i++){
+			for(int j=0; j<total_nodes;j++){
+				if(matrix_pb[i][j]==1){
+					int position = nodes_arr.get(j).index_last();
+					if(counter==knapsack_num){ //remarqui f l'arbre daymen el cas hadak li manajoutiw hata wahed ykoun houwa lakher tritiou f had el cas 
+						matrix_pb[i][j]=1;
+					}
+					else{
+						matrix_pb[i][j]=obj_arr.get(position).value;
+					}
+					counter++;
+				}
+			}
+			counter=0;
+		}
+		//affichage_matrix
+		for(int i=0;i<total_nodes;i++){
+			for(int j=0; j<total_nodes;j++){
+				System.out.print(matrix_pb[i][j]+" ");
+			}
+			System.out.println("\n");
+		}
+	}
 
 
 }/* end of app class */
