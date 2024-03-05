@@ -1,7 +1,9 @@
 import java.util.Scanner;
 import java.util.Stack;
-import java.util.Random;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Random;
 import java.util.LinkedList;
 
 public class Instance {
@@ -17,13 +19,13 @@ public class Instance {
 	int[][] matrix_pb;
 	int knapsack_sum=0;
 	/* PARTIE I */
-
+	int[] knapsackCapacities;
 	public Instance() {
 
 		int max_weightk = 200;// use it to generate a max weight for all knapsacks
 		int min_weightk = 20;// use it to generate a min weight for all knapsacks
-		int max_weighto = 50;// use it to generate a max weight for all objects
-		int min_weighto = 1;// use it to generate a min weight for the objects
+		int max_weighto = 150;// use it to generate a max weight for all objects
+		int min_weighto = 20;// use it to generate a min weight for the objects
 		int max_valo = 100;// use it to generate a max value for the objects
 		int min_valo = 1;// use it to generate a min value for all objects
 		knapsack new_knap;
@@ -44,8 +46,10 @@ public class Instance {
 		obj_arr = new ArrayList<obj>(); // array of objects
 		System.out.println("How much knapsack do you have ?");
 		knapsack_num = scanner.nextInt();
+		knapsackCapacities=new int[knapsack_num];
 		for (int i = 0; i < knapsack_num; i++) {
 			int max = random.nextInt(max_weightk - 10 + 1) + min_weightk;
+			knapsackCapacities[i]=max;
 			new_knap = new knapsack(max, i + 1);
 			knapsack_arr.add(new_knap);
 			knapsack_sum +=max;
@@ -106,17 +110,18 @@ public class Instance {
 		// generating all nodes
 		nodes_arr = new ArrayList<node>();
 		node my_node = new node(objects_num, 0);
+		my_node.set_heuritic(knapsack_sum);
 		nodes_arr.add(my_node);
 		int c = 0, position = 0;
 		int d = 1;
 		int counter = knapsack_num + 1, counter2 = 0; // counter = 3 , counter2=0
 		while (true) {
 			for (int i = 0; i < knapsack_num + 1; i++) {
-				my_node = new node(nodes_arr.get(c).objects, objects_num, d,knapsack_sum,obj_arr);
+				my_node = new node(nodes_arr.get(c).objects, objects_num, d);
 				if (i == knapsack_num) {
-					my_node.set_objects(position, -1);
+					my_node.set_objects(position, -1, nodes_arr.get(c),0);
 				} else {
-					my_node.set_objects(position, i + 1);
+					my_node.set_objects(position, i + 1, nodes_arr.get(c),obj_arr.get(position).weight);
 				}
 				nodes_arr.add(my_node);
 				d++;
@@ -167,7 +172,7 @@ public class Instance {
 		System.out.println();
 		for (int i = 0; i < total_nodes; i++) {
 			nodes_arr.get(i).afficher();
-			System.out.print("heuristic value --> "+nodes_arr.get(i).heuristic);
+			System.out.print("heuristic value --> "+nodes_arr.get(i).heuristic+"    cost  --> "+nodes_arr.get(i).cost);
 			System.out.println();
 		}
 		// Affichage matrice
@@ -330,7 +335,7 @@ public class Instance {
             }
         }
     }
-	public void matrix_tronsformation(){ // transoforming the matrix to value based cost 
+	/*public void matrix_tronsformation(){ // transoforming the matrix to value based cost 
 		int counter=0;
 		for(int i=0;i<total_nodes;i++){
 			for(int j=0; j<total_nodes;j++){
@@ -354,7 +359,58 @@ public class Instance {
 			}
 			System.out.println("\n");
 		}
+	}*/
+    public void AstarAlgorithme(){
+		ArrayList<node> overt=new ArrayList<node>();
+		ArrayList<node> ferme= new ArrayList<node>();
+		ArrayList<node> Solutions = new ArrayList<node>();
+		for(int j=0;j<total_nodes;j++){
+			if(matrix_pb[0][j]!=0){
+				overt.add(nodes_arr.get(j));
+			}
+		}
+		// structuring the overt list smmaller to bigger
+		int counter =0;
+		while(!overt.isEmpty()){
+			Collections.sort(overt, Comparator.comparingInt(node -> node.heuristic + node.cost));
+            // Print the sorted ArrayList
+            node first = overt.get(0);
+			for(int i=0;i<total_nodes;i++){
+				if(matrix_pb[first.number][i]!=0){
+					overt.add(nodes_arr.get(i));
+					counter++;
+				}
+			}
+			if(counter ==0){
+				if(Solutions.size()==0){
+					Solutions.add(first);
+				}
+				else {
+					if(first.cost+first.heuristic>Solutions.get(0).cost+Solutions.get(0).heuristic ){
+						if( first.is_solution(knapsack_arr , obj_arr) !=-1 && first.is_solution(knapsack_arr , obj_arr) < Solutions.get(0).is_solution(knapsack_arr , obj_arr)){ //less number of objects are outside the knapsacks
+							Solutions.clear();
+						    Solutions.add(first);
+						}
+						
+					}
+					else if( first.is_solution(knapsack_arr , obj_arr) !=-1 && first.cost+first.heuristic==Solutions.get(0).cost+Solutions.get(0).heuristic && first.is_solution(knapsack_arr , obj_arr)==1){
+						if(first.is_solution(knapsack_arr , obj_arr) < Solutions.get(0).is_solution(knapsack_arr , obj_arr)){
+						    Solutions.add(first);
+						}
+					}
+				}
+			}
+			counter =0;
+			ferme.add(first);
+			overt.remove(first);
+		}
+		//display the solutions
+		for (node n : Solutions) {
+            System.out.println("Node "+n.number+" - Heuristic: " + n.heuristic + ", Cost: " + n.cost);
+			n.afficher();
+			System.out.println("-------------------");
+        }
+		// najoutiw les cas ta3 fils ta3ha f fermé w n3wdou nrtbou hata nwsslou l cas ma3ndouch des fils ncoumpariwah m3a ga3 lokhrin ida kan sghir hadak houwa solution 
+		// show th Solution 
 	}
-
-
 }/* end of app class */
