@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
@@ -38,7 +39,8 @@ public class Main {
         //implementation d'algorithme A* 
         //1- tronsformer la matrice 
         System.out.println("\n");
-        cas_0.matrix_tronsformation();
+        //cas_0.matrix_tronsformation();
         //2- ajouter le cout d'heuristic a chaque noued 
+        cas_0.AstarAlgorithme();
     }
 }
