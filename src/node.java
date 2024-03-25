@@ -6,6 +6,13 @@ class node{
     int heuristic;
     int cost=0;
     boolean state = true;
+    public String tostirng(){
+        String str="";
+        for(int i=0;i<taille ; i++){
+            str+=objects[i]+"  ";
+        }
+        return str;
+    }
     public node(int[] objs , int taille_node,int num) {
         taille = taille_node;
         objects = new int[taille];
@@ -33,7 +40,13 @@ class node{
     void set_objects(int position , int value , node precedent_node , int weight) {
         objects[position]=value;
         this.heuristic = precedent_node.heuristic-weight;
-        this.cost= precedent_node.cost + weight;
+        if(weight==0){
+            this.cost= precedent_node.cost + 1000;
+        }
+        else{
+          this.cost= precedent_node.cost + weight;  
+        }
+        
     }
     int index_last(){
         for(int i=0;i<taille ; i++){
@@ -51,18 +64,21 @@ class node{
     }
     int is_solution(ArrayList<knapsack> knapsack_arr , ArrayList<obj> obj_arr ){
         int counter =0;
-        ArrayList<knapsack> knap_arr = new ArrayList<>(knapsack_arr);
-        for(int i=0 ; i<taille ; i++){
+        ArrayList<Integer> knap_arr = new ArrayList<>();
+        for(int j=0 ; j<knapsack_arr.size();j++){
+            knap_arr.add(knapsack_arr.get(j).max_weight);
+        }
+        for(int i=0 ; i<taille ; i++){ 
             if(this.objects[i]==-1){
                 counter ++;
             }
             else{
-                knapsack knap = knap_arr.get(objects[i]-1);
-                knap.max_weight -= obj_arr.get(i).weight;
-                knap_arr.set(objects[i]-1 , knap);
-                if(knap_arr.get(objects[i]-1).max_weight<0){
-                    return -1;
-                }
+                knap_arr.set(this.objects[i]-1, knap_arr.get(objects[i]-1)-obj_arr.get(i).weight);
+            }
+        }
+        for(int i=0 ; i<knap_arr.size() ; i++){ // if there is an object in a bad knap (capacity < all objects)
+            if(knap_arr.get(i)<0){
+                return -1;
             }
         }
         return counter;
