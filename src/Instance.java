@@ -20,7 +20,7 @@ public class Instance {
 	int knapsack_sum=0;
 	/* PARTIE I */
 	int[] knapsackCapacities;
-	public Instance() {
+	public Instance(int knap_num , int obj_num) {
 
 		int max_weightk = 200;// use it to generate a max weight for all knapsacks
 		int min_weightk = 20;// use it to generate a min weight for all knapsacks
@@ -44,8 +44,7 @@ public class Instance {
 		 */
 		knapsack_arr = new ArrayList<knapsack>(); // array of knapsakcs
 		obj_arr = new ArrayList<obj>(); // array of objects
-		System.out.println("How much knapsack do you have ?");
-		knapsack_num = scanner.nextInt();
+		knapsack_num = knap_num;
 		knapsackCapacities=new int[knapsack_num];
 		for (int i = 0; i < knapsack_num; i++) {
 			int max = random.nextInt(max_weightk - 10 + 1) + min_weightk;
@@ -61,8 +60,7 @@ public class Instance {
 		 * arraylist t3 les sacs
 		 * darha plusieurs fois 3la hsab nombre de knapsacks
 		 */
-		System.out.println("How much objects do you have ?");
-		objects_num = scanner.nextInt();
+		objects_num = obj_num;
 		for (int i = 0; i < objects_num; i++) {
 			int max = random.nextInt(max_weighto - 10 + 1) + min_weighto;
 			int max_val = random.nextInt(max_valo - 10 + 1) + min_valo;
@@ -168,21 +166,22 @@ public class Instance {
 
 	public void Afficher_model() {
 		// Affichage noeuds
-		System.out.println("======nodes======");
+		/*System.out.println("======nodes======");
 		System.out.println();
 		for (int i = 0; i < total_nodes; i++) {
 			nodes_arr.get(i).afficher();
 			System.out.print("heuristic value --> "+nodes_arr.get(i).heuristic+"    cost  --> "+nodes_arr.get(i).cost);
 			System.out.println();
-		}
+		}*/
+
 		// Affichage matrice
-		System.out.println("======matrix======");
+		/*System.out.println("======matrix======");
 		for (int i = 0; i < total_nodes; i++) {
 			for (int j = 0; j < total_nodes; j++) {
 				System.out.print(matrix_pb[i][j]);
 			}
 			System.out.println();
-		}
+		}*/
 
 		/*
 		 * In sum na3erfou mn lewel pattern T3 graphe t3na kifah ydji et on l'a traduit
@@ -274,7 +273,7 @@ public class Instance {
 	    for (int i = 0; i < sol.taille; i++) {
 	        if (sol.objects[i] == -1) {
 	            // remove this case where an object is not in knapsacks
-	            return;
+	            continue;
 	        } else {
 	            knapsack knap = testing_arr.get(sol.objects[i] - 1);
 	            knap.max_weight = knap.max_weight - obj_arr.get(i).weight;
@@ -291,10 +290,11 @@ public class Instance {
 	        }
 	    }
 
-	    if (status) {
+		// afficher tous les solution DFS
+	    /*if (status) {
 	        nodes_arr.get(index).afficher();
 	        System.out.print("  ");
-	    }
+	    }*/
 	    if (status && current_solution.sum_value < sumv) {
 	        sols.clear();
 	        sols.add(new solution(sol, sumv));
@@ -335,36 +335,11 @@ public class Instance {
             }
         }
     }
-	/*public void matrix_tronsformation(){ // transoforming the matrix to value based cost 
-		int counter=0;
-		for(int i=0;i<total_nodes;i++){
-			for(int j=0; j<total_nodes;j++){
-				if(matrix_pb[i][j]==1){
-					int position = nodes_arr.get(j).index_last();
-					if(counter==knapsack_num){ //remarqui f l'arbre daymen el cas hadak li manajoutiw hata wahed ykoun houwa lakher tritiou f had el cas 
-						matrix_pb[i][j]=1;
-					}
-					else{
-						matrix_pb[i][j]=obj_arr.get(position).value;
-					}
-					counter++;
-				}
-			}
-			counter=0;
-		}
-		//affichage_matrix
-		for(int i=0;i<total_nodes;i++){
-			for(int j=0; j<total_nodes;j++){
-				System.out.print(matrix_pb[i][j]+" ");
-			}
-			System.out.println("\n");
-		}
-	}*/
-    public void AstarAlgorithme(){
+    public node AstarAlgorithme(){
 		ArrayList<node> overt=new ArrayList<node>();
 		ArrayList<node> ferme= new ArrayList<node>();
 		ArrayList<node> Solutions = new ArrayList<node>();
-		for(int j=0;j<total_nodes;j++){
+		for(int j=0;j<total_nodes;j++){ // add the child nodes to the overt list
 			if(matrix_pb[0][j]!=0){
 				overt.add(nodes_arr.get(j));
 			}
@@ -372,8 +347,7 @@ public class Instance {
 		// structuring the overt list smmaller to bigger
 		int counter =0;
 		while(!overt.isEmpty()){
-			Collections.sort(overt, Comparator.comparingInt(node -> node.heuristic + node.cost));
-            // Print the sorted ArrayList
+			Collections.sort(overt, Comparator.comparingInt(node -> node.heuristic + node.cost)); //sorting the list ascndenly 
             node first = overt.get(0);
 			for(int i=0;i<total_nodes;i++){
 				if(matrix_pb[first.number][i]!=0){
@@ -381,8 +355,9 @@ public class Instance {
 					counter++;
 				}
 			}
-			if(counter ==0){
+			if(counter ==0){ //if we have no child = the node is a child
 				if(Solutions.size()==0){
+					if(first.is_solution(knapsack_arr, obj_arr)!=-1)
 					Solutions.add(first);
 				}
 				else {
@@ -406,10 +381,11 @@ public class Instance {
 		}
 		//display the solutions
 		for (node n : Solutions) {
-            System.out.println("Node "+n.number+" - Heuristic: " + n.heuristic + ", Cost: " + n.cost);
+			System.out.println("\n\n======A star Solution======\n\n");
+            System.out.println("Node : "+n.number+" - Heuristic value : " + n.heuristic + ", Cost: " + n.cost);
 			n.afficher();
-			System.out.println("-------------------");
         }
+		return Solutions.get(0);
 		// najoutiw les cas ta3 fils ta3ha f fermé w n3wdou nrtbou hata nwsslou l cas ma3ndouch des fils ncoumpariwah m3a ga3 lokhrin ida kan sghir hadak houwa solution 
 		// show th Solution 
 	}
