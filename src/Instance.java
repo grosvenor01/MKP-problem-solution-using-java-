@@ -1,5 +1,8 @@
 import java.util.Scanner;
 import java.util.Stack;
+
+import org.w3c.dom.Node;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -335,7 +338,7 @@ public class Instance {
             }
         }
     }
-    public node AstarAlgorithme(){
+	public node AstarAlgorithme(){
 		ArrayList<node> overt=new ArrayList<node>();
 		ArrayList<node> ferme= new ArrayList<node>();
 		ArrayList<node> Solutions = new ArrayList<node>();
@@ -365,6 +368,7 @@ public class Instance {
 						if( first.is_solution(knapsack_arr , obj_arr) !=-1 && first.is_solution(knapsack_arr , obj_arr) < Solutions.get(0).is_solution(knapsack_arr , obj_arr)){ //less number of objects are outside the knapsacks
 							Solutions.clear();
 						    Solutions.add(first);
+							
 						}
 						
 					}
@@ -373,18 +377,15 @@ public class Instance {
 						    Solutions.add(first);
 						}
 					}
+					else if(first.is_solution(knapsack_arr, obj_arr)!=-1){ // case ou ce fils est optimal = est plus optimal que tous les autre donc on sort
+						overt.clear();
+					}
 				}
 			}
 			counter =0;
 			ferme.add(first);
 			overt.remove(first);
 		}
-		//display the solutions
-		for (node n : Solutions) {
-			System.out.println("\n\n======A star Solution======\n\n");
-            System.out.println("Node : "+n.number+" - Heuristic value : " + n.heuristic + ", Cost: " + n.cost);
-			n.afficher();
-        }
 		return Solutions.get(0);
 		// najoutiw les cas ta3 fils ta3ha f fermé w n3wdou nrtbou hata nwsslou l cas ma3ndouch des fils ncoumpariwah m3a ga3 lokhrin ida kan sghir hadak houwa solution 
 		// show th Solution 
