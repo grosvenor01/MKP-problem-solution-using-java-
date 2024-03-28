@@ -1,3 +1,4 @@
+//Salam...
 import java.util.Scanner;
 import java.util.Stack;
 
@@ -195,22 +196,26 @@ public class Instance {
 
 	public void BFS_solve() {
 		// BFS BASED ON THE ADJACENCY MATRIX
-		int[] sac = new int[knapsack_arr.size()];
-		;
-		for (int i = 0; i < knapsack_arr.size(); i++) {
-			sac[i] = knapsack_arr.get(i).max_weight;
-		}
-		LinkedList<Integer> file = new LinkedList<>();
+		int[] sac = new int[knapsack_arr.size()];		
+		LinkedList<Integer> file = new LinkedList<Integer>();
 		file.offer(0);
 
 		// 2H 3ladjal hadi!
 		int cpt = 0;
-
+		int leaf = 0,check=0;
+		ArrayList<node> sol_arr = new ArrayList<node>();
+		ArrayList<Integer> sol_val = new ArrayList<Integer>();
 		int i, bestval = 0, totalval = 0, best_config = -1;
 		node config;
 		while (!file.isEmpty()) {
 			cpt = 0;
+			totalval=0;
+			for (int s = 0; s < knapsack_arr.size(); s++) {
+				sac[s] = knapsack_arr.get(s).max_weight;
+			}
 			i = file.poll();
+
+			// parcours ligne matrice et ajoute le noeuds fils à la file, on les compte dans cpt
 			for (int j = 0; j < total_nodes; j++) {
 				if (matrix_pb[i][j] == 1) {
 					cpt++;
@@ -218,10 +223,13 @@ public class Instance {
 				}
 
 			}
+
+			//ICI on verifie cpt, donc le nombre de noeuds fils ajoutés à la file, si 0 donc notre noeud est une feuille
 			if (cpt == 0) {
 				// ce noued i est une feuille, je le récupere de node_arr à indice i
+				leaf ++;
 				config = nodes_arr.get(i);
-				for (int k = 0; k < config.objects.length; k++) {
+				for (int k = 0; k < config.taille; k++) {
 					/* in case the object is taken */
 					if (config.objects[k] != -1) {
 						/* nehou le poids t3 l'objet li dinah ml poid li yehemlou sac à dos */
@@ -231,7 +239,8 @@ public class Instance {
 							totalval = totalval + obj_arr.get(k).value;
 							/* ida mayahmelch nehi kaml had l config ou redje3 la valeur t3ha à 0 */
 						} else {
-							totalval = 0;
+							totalval = -1;
+							check++;
 							break;
 						}
 					}
@@ -242,24 +251,151 @@ public class Instance {
 				// nsauvgardiwha
 				// hia ou valeur t3ha
 
-				if (bestval <= totalval) {
-					bestval = totalval;
-					best_config = i;
+				if (totalval != -1) {
+					sol_arr.add(nodes_arr.get(i));
+					sol_val.add(totalval);
+					if (bestval < totalval ) {
+						bestval = totalval;
+						best_config = i;
+					}
 				}
-			} /* end of leaf treatement */
+			}/* end of leaf treatement */
+	} /* end of while */
 
-		} /* end of while */
+		 
 
+		//Affichage solutions possibles
+		System.out.println( "\n\n=======Solutions possibles : \n" );		
+		System.out.println("nombre de solution possibles : " + sol_arr.size() );
+		System.out.println("nombre de combinaisons impossibles : " + check );
+		System.out.println("nombre de feuilles : " + leaf );
+		if (sol_arr.size() == 0){
+			System.out.println("Aucune solution possible");
+		}else{
+			/* System.out.println("Un essai rapide:");
+			sol_arr.get(0).afficher();			
+			sol_arr.get(1).afficher();
+			sol_arr.get(2).afficher(); */
+			for(int k=0 ; k< sol_arr.size() ; k++ ){
+				System.out.print(k + " : ");
+				sol_arr.get(k).afficher();
+				System.out.println(" / " + sol_val.get(k));
+			}
+			
+		}
+		System.out.println( "\n\n=======Solution optimale :\n" );
 		if (best_config == -1) {
 			System.out.println("Aucune configuration correcte !");
-			System.out.println(best_config);
 		} else {
-			System.out.println("La configuration la plus optimal est la suivante");
+			System.out.println("La configuration la plus optimal est la suivante :");
 			nodes_arr.get(best_config).afficher();
 			System.out.println(" avec une valeur de " + bestval + " Et best_config:" + best_config + "\n");
 
 		}
 	}
+
+	// DFS personnalisé kima BFS
+
+	public void DFS_solve() {
+		// BFS BASED ON THE ADJACENCY MATRIX
+		int[] sac = new int[knapsack_arr.size()];		
+		LinkedList<Integer> pile = new LinkedList<Integer>();
+		pile.offer(0);
+
+		// 2H 3ladjal hadi!
+		int cpt = 0;
+		int leaf = 0,check=0;
+		ArrayList<node> sol_arr = new ArrayList<node>();
+		ArrayList<Integer> sol_val = new ArrayList<Integer>();
+		int i, bestval = 0, totalval = 0, best_config = -1;
+		node config;
+		while (!pile.isEmpty()) {
+			cpt = 0;
+			totalval=0;
+			for (int s = 0; s < knapsack_arr.size(); s++) {
+				sac[s] = knapsack_arr.get(s).max_weight;
+			}
+			i = pile.removeLast();
+
+			// parcours ligne matrice et ajoute le noeuds fils à la file, on les compte dans cpt
+			for (int j = 0; j < total_nodes; j++) {
+				if (matrix_pb[i][j] == 1) {
+					cpt++;
+					pile.offer(j);
+				}
+
+			}
+
+			//ICI on verifie cpt, donc le nombre de noeuds fils ajoutés à la file, si 0 donc notre noeud est une feuille
+			if (cpt == 0) {
+				// ce noued i est une feuille, je le récupere de node_arr à indice i
+				leaf ++;
+				config = nodes_arr.get(i);
+				for (int k = 0; k < config.taille; k++) {
+					/* in case the object is taken */
+					if (config.objects[k] != -1) {
+						/* nehou le poids t3 l'objet li dinah ml poid li yehemlou sac à dos */
+						sac[config.objects[k] - 1] = sac[config.objects[k] - 1] - obj_arr.get(k).weight;
+						/* ida sac yehmel, nzidou valeur t3 l'objet l valeur total */
+						if (sac[config.objects[k] - 1] >= 0) {
+							totalval = totalval + obj_arr.get(k).value;
+							/* ida mayahmelch nehi kaml had l config ou redje3 la valeur t3ha à 0 */
+						} else {
+							totalval = -1;
+							check++;
+							break;
+						}
+					}
+
+				}
+
+				// Doka na3arfou randement t3 had la combin, ida khir min li 9belha
+				// nsauvgardiwha
+				// hia ou valeur t3ha
+
+				if (totalval != -1) {
+					sol_arr.add(nodes_arr.get(i));
+					sol_val.add(totalval);
+					if (bestval < totalval ) {
+						bestval = totalval;
+						best_config = i;
+					}
+				}
+			}/* end of leaf treatement */
+	} /* end of while */
+
+		 
+
+		//Affichage solutions possibles
+		System.out.println( "\n\n=======Solutions possibles : \n" );		
+		System.out.println("nombre de solution possibles : " + sol_arr.size() );
+		System.out.println("nombre de combinaisons impossibles : " + check );
+		System.out.println("nombre de feuilles : " + leaf );
+		if (sol_arr.size() == 0){
+			System.out.println("Aucune solution possible");
+		}else{
+			/* System.out.println("Un essai rapide:");
+			sol_arr.get(0).afficher();			
+			sol_arr.get(1).afficher();
+			sol_arr.get(2).afficher(); */
+			for(int k=0 ; k< sol_arr.size() ; k++ ){
+				System.out.print(k + " : ");
+				sol_arr.get(k).afficher();
+				System.out.println(" / " + sol_val.get(k));
+			}
+			
+		}
+		System.out.println( "\n\n=======Solution optimale :\n" );
+		if (best_config == -1) {
+			System.out.println("Aucune configuration correcte !");
+		} else {
+			System.out.println("La configuration la plus optimal est la suivante :");
+			nodes_arr.get(best_config).afficher();
+			System.out.println(" avec une valeur de " + bestval + " Et best_config:" + best_config + "\n");
+
+		}
+	}
+
 
     public void best_solution(int index, ArrayList<node> nodes_arr, solution current_solution, ArrayList<obj> obj_arr, ArrayList<knapsack> knapsack_arr, ArrayList<solution> sols) {
 	    // remove the case of -1 appearing in the objects array
