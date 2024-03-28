@@ -5,6 +5,7 @@ class node{
     int number;
     int heuristic;
     int cost=0;
+    int value=0;
     boolean state = true;
     public String tostirng(){
         String str="";
@@ -37,14 +38,20 @@ class node{
             System.out.print(objects[i]);
         }
     }
-    void set_objects(int position , int value , node precedent_node , int weight) {
+    void set_objects(int position , int value , node precedent_node , int weight , ArrayList<obj> obj_arr) {
         objects[position]=value;
         this.heuristic = precedent_node.heuristic-weight;
         if(weight==0){
-            this.cost= precedent_node.cost + 1000;
+            this.cost= precedent_node.cost + 1000; //if the knapsack is not inside the cost is 1000
         }
         else{
           this.cost= precedent_node.cost + weight;  
+        }
+        for(int i=0;i<=position;i++){
+            if(objects[i]!=-1){
+                this.value += obj_arr.get(objects[i]-1).value;
+            }
+            
         }
         
     }

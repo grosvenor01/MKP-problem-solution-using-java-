@@ -55,20 +55,15 @@ public class graphic extends JFrame {
                     // Solution à la instance courante
                     System.out.println("\n\n======Solution BFS======\n\n");
                     startTime = System.nanoTime();
-                    cas_0.BFS_solve();
+                    node bfs_sol;
+                    bfs_sol=cas_0.BFS_solve();
                     endTime = System.nanoTime();
                     double BFSTime = (double) (endTime - startTime) /1000000;
 
                     System.out.println("\n\n======Solution DFS======\n\n");
                     startTime = System.nanoTime();
-                    solution sol = new solution(cas_0.nodes_arr.get(0), 0);
-                    ArrayList<solution> solutions = new ArrayList<solution>();
-                    cas_0.dfs(sol, solutions);
-                    if (solutions.size() > 0) {
-                        solutions.get(0).afficher();
-                    } else {
-                        System.out.println("No Solution Found");
-                    }
+                    node dfs_sol;
+                    dfs_sol=cas_0.DFS_solve();
                     endTime = System.nanoTime();
                     double DFSTime = (double) (endTime - startTime) /1000000;
 
@@ -78,7 +73,7 @@ public class graphic extends JFrame {
                     endTime = System.nanoTime();
                     double AstarTime = (double) (endTime - startTime) /1000000;
                     // Update image panels
-                    updateImagePanels(solutions.get(0).solution_node, Astar_sols, Astar_sols , DFSTime,BFSTime,AstarTime);
+                    updateImagePanels(dfs_sol, bfs_sol , Astar_sols,  DFSTime,BFSTime,AstarTime);
 
                 } else {
                     JOptionPane.showMessageDialog(null, "Invalid number entered. Please enter a valid integer.",
